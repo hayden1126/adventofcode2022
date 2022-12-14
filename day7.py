@@ -1,4 +1,4 @@
-import json
+# import json
 '''
 Assumptions:
 1: No empty directories
@@ -40,17 +40,18 @@ for line in inputs[1:]:
     if type(line) == list:
         for item in line[1:]:
             temp = item.split()
-
+            
+            p = "-".join(path)
             # If directory
             if temp[0] == "dir":
-                temp_directory[temp[1]] = {}
-                directory_sizes[temp[1]] = [0]
+                temp_directory[f"{p}-{temp[1]}"] = {}
+                directory_sizes[f"{p}-{temp[1]}"] = [0]
                 # print(path[-1])
-                directory_sizes[path[-1]].append(temp[1])
+                directory_sizes[p].append(f"{p}-{temp[1]}")
             # If file
             if temp[0].isnumeric():
-                temp_directory[temp[1]] = int(temp[0])
-                directory_sizes[path[-1]][0] += int(temp[0])
+                temp_directory[f"{p}-{temp[1]}"] = int(temp[0])
+                directory_sizes[p][0] += int(temp[0])
 
     # If command is "cd"
     else: # type(line) == str:
@@ -58,11 +59,11 @@ for line in inputs[1:]:
         if cd_path == "..":
             path.pop(-1)
             temp_directory = directories
-            for dir in path[1:]:
-                temp_directory = temp_directory[dir]
+            for i in range(2, len(path)+1):
+                temp_directory = temp_directory[f"{'-'.join(path[:i])}"]
         else:
             path.append(cd_path)
-            temp_directory = temp_directory[cd_path]
+            temp_directory = temp_directory[f"{'-'.join(path)}"]
 print(directories)
 # print(directory_sizes)
 
@@ -93,6 +94,19 @@ for directory, size in directory_sizes.items():
         sum += size[0]
 print(sum)
 
+# Part 2
+unused_space = 70000000 - directory_sizes['/'][0]
+extra_space_needed = 30000000 - unused_space
+
+smallest = directory_sizes['/'][0]
+for directory, size in directory_sizes.items():
+    if size[0] - extra_space_needed >= 0:
+        if size[0] < smallest:
+            smallest = size[0]
+
+print(smallest)
+
+
 '''
 directories = 
 {
@@ -120,7 +134,5 @@ To begin, find all of the directories with a total size of at most 100000, then 
 Find all of the directories with a total size of at most 100000. What is the sum of the total sizes of those directories?
 '''
 
-# Answer: 810856
-
-json_object = json.dumps(directories, indent = 4) 
-print(json_object)
+# json_object = json.dumps(directories, indent = 4) 
+# print(json_object)
